@@ -34,8 +34,6 @@ class vertech(tk.Tk):
         displays the saved counter in the event that the user clicks resume'''
         
         frame = self.frames[cont]
-        #if Game == cont:
-        #    displaySavedCounter()
         frame.tkraise()
 
 
@@ -53,7 +51,7 @@ class Main_menu(tk.Frame):
         
         menu_play = tk.Button(self, text="Begin Learning!", font = "LARGE_FONT",
                               bg="mediumslateblue", fg="white",
-                              command=lambda: controller.show_frame(Learn))
+                              command=combine_funcs(lambda: controller.show_frame(Learn), plotAndCalculate))
         menu_play.pack(padx=5, pady=5)
         
         menu_quit = tk.Button(self, text="Quit", bg="PaleVioletRed", fg="white",
@@ -83,7 +81,7 @@ class Learn(tk.Frame):
                                     command=lambda: controller.show_frame(Main_menu))
         Learn_home_btn.pack(padx=5, pady=10)   
         
-def plotAndCalculate():
+def plot():
     # Ask for file input
     filename = input('Please enter the name of the file: ')
     
@@ -109,12 +107,13 @@ def plotAndCalculate():
             # If the first and last coordinates do not match, yield and error
             if (xList[0] != xList[-1] or yList[0] != yList[-1]):
                 raise Exception('Initial Coordinates do not match Final Coordinates!')
-                
+    except IOError: #This error occurs if the file is not found, or failed to open.
+        print("File failed to open.")
+    except Exception as e: #This is a general error caused likely to faulty coordinates.
+        print(e)    
             # Plot the result
-            plt.plot(xList, yList)
-            coords.pop(-1)
-            coords.sort()
-            
+            #plot(xList, yList)
+def calculate():           
             # Take first two elements in current list
             areaTotal = 0
             while coords:
@@ -180,11 +179,19 @@ def plotAndCalculate():
         print("File failed to open.")
     except Exception as e: #This is a general error caused likely to faulty coordinates.
         print(e)
-        
+
+def plot(x, y):
+    plt.plot(x, y)
+
+def combine_funcs(*funcs):
+    def combined_func(*args, **kwargs):
+        for f in funcs:
+            f(*args, **kwargs)
+    return combined_func
 ########################################################################################################
 vertech = vertech()
 #vertech.protocol('WM_DELETE_WINDOW', overrideWindowX)
 vertech.title("Vertech")
-vertech.geometry('+%d+%d' % (400, 200))
+#vertech.geometry('+%d+%d' % (400, 200))
 vertech.resizable(width=False, height=False)
 vertech.mainloop()
