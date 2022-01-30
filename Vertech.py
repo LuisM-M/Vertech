@@ -99,43 +99,47 @@ class Learn(tk.Frame):
                              font=("LARGE_FONT", 15,"bold"))
         Learn.promptAnswer_lbl.pack(padx=5, pady=15)
         
-        
-        Learn_home_btn = tk.Button(self, text="Home", bg="mediumslateblue",
+        Learn_home_btn = tk.Button(self, text="Next", bg="mediumslateblue",
                                     fg="white",
-                                    command=lambda: controller.show_frame(Main_menu))
+                                    command=reset)
         Learn_home_btn.pack(padx=5, pady=5)   
+
+def reset():
+    global next_count
+    Learn.my_text.delete('1.0', tk.END)
+    next_count += 1
+    
 
 def click():
     answer = Learn.my_text.get('1.0', tk.END)
-    #answer="1288.0"
     Learn.my_text.delete('1.0', tk.END)
-    #calculate()
-    #print("area in click is: " + str(areaTotal))
-    #print("areaTotal is: " + str(areaTotal))
-    #print("answer is: " + str(answer))
-    if (areaTotal == int(answer)):
+    if (areaTotal == float(answer)):
         Learn.promptAnswer_lbl.config(text="Correct!", font = 'LARGEFONT')
     else:
-        Learn.promptAnswer_lbl.config(text="Wrong!", font = 'LARGEFONT')
+        Learn.promptAnswer_lbl.config(text="Incorrect, try again", font = 'LARGEFONT')
         Learn.my_text.delete('1.0', tk.END)
         
 def plot():
     global coords
-    with open("box_hard_1.txt", "r") as f:
+    if (next_count == 0):
+        file = "box_hard_1.txt"
+    elif (next_count == 1):
+        file = "box_hard_2.txt"
+    elif (next_count == 2):
+        file = "box_hard_3.txt"
+    with open(file, "r") as f:
         newWindow = Toplevel(vertech)
         xList = [] # List of all x-values in coordinates
         yList = [] # List of all y-values in coordinates
-        #coords = []
              
-             # Add coordinates to lists
+        # Add coordinates to lists
         for line in f.readlines():
              temp = line.split()
              c = (float(temp[0]), float(temp[1]))
              coords.append(c)
              xList.append(float(temp[0]))
              yList.append(float(temp[1]))
-        #for i in coords:
-        #    print(i)
+
         fig = Figure(figsize = (5, 5),
                     dpi = 100)
         
@@ -215,13 +219,16 @@ def calculate():
         elif (c3!= None and c4 != None):
             coords.remove(c3)
             coords.remove(c4)      
-    #print("area in function is: " + str(areaTotal))
+    print("area in function is: " + str(areaTotal))
 
 def combine_funcs(*funcs):
     def combined_func(*args, **kwargs):
         for f in funcs:
             f(*args, **kwargs)
     return combined_func
+
+
+
 ########################################################################################################
 vertech = vertech()
 #vertech.protocol('WM_DELETE_WINDOW', overrideWindowX)
@@ -229,5 +236,6 @@ vertech.title("Vertech")
 vertech.geometry("513x360")
 coords = []  # List of coordinates, saved as tuples
 areaTotal = 0
+next_count = 0
 vertech.resizable(width=False, height=False)
 vertech.mainloop()
