@@ -24,7 +24,7 @@ class vertech(tk.Tk):
         
         self.frames = {}
         
-        for page in (Main_menu, Learn):
+        for page in (Main_menu, Learn, Free):
             frame = page(main_frame, self)
             self.frames[page] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -56,6 +56,11 @@ class Main_menu(tk.Frame):
                               bg="mediumslateblue", fg="white",
                               command=combine_funcs(lambda: controller.show_frame(Learn)))
         menu_play.pack(padx=25, pady=25)
+        
+        menu_free = tk.Button(self, text="Sandbox", font = "LARGE_FONT",
+                              bg="mediumslateblue", fg="white",
+                              command=combine_funcs(lambda: controller.show_frame(Free)))
+        menu_free.pack(padx=25, pady=25)
         
         menu_quit = tk.Button(self, text="Quit", bg="PaleVioletRed", fg="white",
                               command=controller.destroy)
@@ -99,24 +104,63 @@ class Learn(tk.Frame):
                              font=("LARGE_FONT", 15,"bold"))
         Learn.promptAnswer_lbl.pack(padx=5, pady=15)
         
+        
         Learn_home_btn = tk.Button(self, text="Next", bg="mediumslateblue",
                                     fg="white",
                                     command=reset)
         Learn_home_btn.pack(padx=5, pady=5)   
 
+class Free(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        tk.Frame.configure(self, bg=bg_color)
+        
+        Free.class_and_grade_lbl = tk.Label(self, text = "", bg=bg_color)
+        Free.class_and_grade_lbl.pack(padx=5, pady=5)
+        
+        Free_upload_btn = tk.Button(self, text="Upload that thing!", font = "LARGE_FONT",
+                                    bg="mediumslateblue", fg="white",
+                                    command=UploadAction)
+        Free_upload_btn.pack(padx=5, pady=20)
+        
+        Free.ans = tk.Label(self, text="", bg=bg_color, fg="black",
+                             font=("LARGE_FONT", 15,"bold"))
+        Free.ans.pack(padx=5, pady=15)
+        
+        Free_home_btn = tk.Button(self, text="Home", bg="mediumslateblue",
+                                    fg="white",
+                                    command=lambda: controller.show_frame(Main_menu))
+        Free_home_btn.pack(padx=5, pady=5)
+
 def reset():
-    global next_count
     Learn.my_text.delete('1.0', tk.END)
+    global next_count
     next_count += 1
+
+def UploadAction(event=None):
+    filename = filedialog.askopenfilename()
+    print('Selected:', filename)
+    plotCalc()
+
+def plotCalc():
+    plot()
+    calculate()
+    print(areaTotal)
+    Free.ans.config(text="AREA: " + str(areaTotal) + " units^2", font = 'LARGEFONT')
     
 
 def click():
     answer = Learn.my_text.get('1.0', tk.END)
+    #answer="1288.0"
     Learn.my_text.delete('1.0', tk.END)
-    if (areaTotal == float(answer)):
+    #calculate()
+    #print("area in click is: " + str(areaTotal))
+    #print("areaTotal is: " + str(areaTotal))
+    #print("answer is: " + str(answer))
+    if (areaTotal == int(answer)):
         Learn.promptAnswer_lbl.config(text="Correct!", font = 'LARGEFONT')
     else:
-        Learn.promptAnswer_lbl.config(text="Incorrect, try again", font = 'LARGEFONT')
+        Learn.promptAnswer_lbl.config(text="Wrong!", font = 'LARGEFONT')
         Learn.my_text.delete('1.0', tk.END)
         
 def plot():
@@ -131,23 +175,23 @@ def plot():
         newWindow = Toplevel(vertech)
         xList = [] # List of all x-values in coordinates
         yList = [] # List of all y-values in coordinates
+        #coords = []
+        coords.clear()
              
-        # Add coordinates to lists
+             # Add coordinates to lists
         for line in f.readlines():
              temp = line.split()
              c = (float(temp[0]), float(temp[1]))
              coords.append(c)
              xList.append(float(temp[0]))
              yList.append(float(temp[1]))
-
         fig = Figure(figsize = (5, 5),
                     dpi = 100)
         
         # adding the subplot
         plot1 = fig.add_subplot(111)
-        
-        plot1.plot(xList, yList)
-        
+        plot1.scatter(xList, yList)
+        plot1.plot(xList, yList)        
         
         canvas = FigureCanvasTkAgg(fig, master = newWindow)  
         canvas.draw()
@@ -157,6 +201,7 @@ def plot():
 def calculate():           
     global coords
     global areaTotal
+    areaTotal = 0
     #print(len(coords))
     if (len(coords) != 0):
         coords.pop(-1)
@@ -219,16 +264,13 @@ def calculate():
         elif (c3!= None and c4 != None):
             coords.remove(c3)
             coords.remove(c4)      
-    print("area in function is: " + str(areaTotal))
+    #print("area in function is: " + str(areaTotal))
 
 def combine_funcs(*funcs):
     def combined_func(*args, **kwargs):
         for f in funcs:
             f(*args, **kwargs)
     return combined_func
-
-
-
 ########################################################################################################
 vertech = vertech()
 #vertech.protocol('WM_DELETE_WINDOW', overrideWindowX)
