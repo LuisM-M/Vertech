@@ -83,7 +83,7 @@ class Learn(tk.Frame):
         Learn.class_and_grade_lbl.pack(padx=5, pady=10)
         
         Learn_display_graph_btn = tk.Button(self, text="Display shape", bg="mediumslateblue", fg="white",
-                              command=plot(createWindow()))
+                              command=plot)
         Learn_display_graph_btn.pack(padx=5, pady=5)
    
         Learn_home_btn = tk.Button(self, text="Home", bg="mediumslateblue",
@@ -92,14 +92,14 @@ class Learn(tk.Frame):
 
         Learn_home_btn.pack(padx=5, pady=10)   
 
-def createWindow():
-    master = Tk()
-    newWindow = Toplevel(master)
-    return newWindow
+#def createWindow():
+#    master = Tk()
+#    newWindow = Toplevel(master)
+#    return newWindow
         
-def plot(parent):
+def plot():
     with open("box_hard_1.txt", "r") as f:
-        
+        newWindow = Toplevel(vertech)
         xList = [] # List of all x-values in coordinates
         yList = [] # List of all y-values in coordinates
         coords = []
@@ -125,7 +125,7 @@ def plot(parent):
         plot1.plot(yList)
         
         
-        canvas = FigureCanvasTkAgg(fig, master = parent)  
+        canvas = FigureCanvasTkAgg(fig, master = newWindow)  
         canvas.draw()
         canvas.get_tk_widget().pack()
       
