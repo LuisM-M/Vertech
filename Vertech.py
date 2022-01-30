@@ -1,3 +1,6 @@
+# VERTECH: An area calculator learning program
+# MADE BY: Anna Huang, Luis Martinez Morales, Akhil Mathew, Eric Nunes - AUSTIN DYNAMICS
+
 # Imports
 import matplotlib.pyplot as plt
 import numpy as np
@@ -139,13 +142,13 @@ def reset():
 
 def UploadAction(event=None):
     filename = filedialog.askopenfilename()
-    print('Selected:', filename)
+    #print('Selected:', filename)
     plotCalc()
 
 def plotCalc():
     plot()
     calculate()
-    print(areaTotal)
+    #print(areaTotal)
     Free.ans.config(text="AREA: " + str(areaTotal) + " units^2", font = 'LARGEFONT')
     
 
