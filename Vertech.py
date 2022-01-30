@@ -107,21 +107,17 @@ class Learn(tk.Frame):
 
 def click():
     answer = Learn.my_text.get('1.0', tk.END)
-    answer="1288.0"
-    print(answer.isdecimal())
-    if (answer.isdigit() == False):
-        Learn.promptAnswer_lbl.config(text="wth, please enter a valid number", font = 'LARGEFONT')
-        Learn.my_text.delete('1.0', tk.END)
+    #answer="1288.0"
+    Learn.my_text.delete('1.0', tk.END)
+    #calculate()
+    #print("area in click is: " + str(areaTotal))
+    #print("areaTotal is: " + str(areaTotal))
+    #print("answer is: " + str(answer))
+    if (areaTotal == int(answer)):
+        Learn.promptAnswer_lbl.config(text="Correct!", font = 'LARGEFONT')
     else:
-        #calculate()
-        #print("area in click is: " + str(areaTotal))
-        #print("areaTotal is: " + str(areaTotal))
-        #print("answer is: " + str(answer))
-        if (areaTotal == int(answer)):
-            Learn.promptAnswer_lbl.config(text="Correct!", font = 'LARGEFONT')
-        else:
-            Learn.promptAnswer_lbl.config(text="Wrong!", font = 'LARGEFONT')
-            Learn.my_text.delete('1.0', tk.END)
+        Learn.promptAnswer_lbl.config(text="Wrong!", font = 'LARGEFONT')
+        Learn.my_text.delete('1.0', tk.END)
         
 def plot():
     global coords
@@ -219,7 +215,7 @@ def calculate():
         elif (c3!= None and c4 != None):
             coords.remove(c3)
             coords.remove(c4)      
-    print("area in function is: " + str(areaTotal))
+    #print("area in function is: " + str(areaTotal))
 
 def combine_funcs(*funcs):
     def combined_func(*args, **kwargs):
@@ -230,7 +226,7 @@ def combine_funcs(*funcs):
 vertech = vertech()
 #vertech.protocol('WM_DELETE_WINDOW', overrideWindowX)
 vertech.title("Vertech")
-vertech.geometry("513x340")
+vertech.geometry("513x360")
 coords = []  # List of coordinates, saved as tuples
 areaTotal = 0
 vertech.resizable(width=False, height=False)
