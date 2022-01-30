@@ -50,7 +50,7 @@ class Main_menu(tk.Frame):
         
         menu_title = tk.Label(self, text="Vertech", bg=bg_color, fg="black",
                              font=("LARGE_FONT", 18,"bold"))
-        menu_title.pack(padx=25, pady=25)
+        menu_title.pack(padx=210, pady=25)
         
         menu_play = tk.Button(self, text="Begin Learning!", font = "LARGE_FONT",
                               bg="mediumslateblue", fg="white",
@@ -84,27 +84,47 @@ class Learn(tk.Frame):
         Learn_display_graph_btn.pack(padx=5, pady=5)
    
         Learn_promptAnswer = tk.Label(self, text="Your Answer: ", bg=bg_color, fg="black",
-                             font=("LARGE_FONT", 18,"bold"))
-        Learn_promptAnswer.pack(padx=5, pady=25) 
+                             font=("LARGE_FONT", 15,"bold"))
+        Learn_promptAnswer.pack(padx=5, pady=15) 
    
-        Learn.my_text = tk.Text(self, width=15, height=10)
-        Learn.my_text.pack(pady=20) 
+        Learn.my_text = tk.Text(self, width=10, height=1)
+        Learn.my_text.pack(pady=25) 
         
         Learn_submit_btn = tk.Button(self, text = 'Enter', bg="mediumslateblue",
                                     fg="white",
-                                    command=click)
-        Learn_submit_btn.pack(padx=5, pady=15)
+                                    command=combine_funcs(combine_funcs(calculate, click), lambda: controller.show_frame(Learn)))
+        Learn_submit_btn.pack(padx=5, pady=20)
+        
+        Learn.promptAnswer_lbl = tk.Label(self, text="", bg=bg_color, fg="black",
+                             font=("LARGE_FONT", 15,"bold"))
+        Learn.promptAnswer_lbl.pack(padx=5, pady=15)
+        
+        
         Learn_home_btn = tk.Button(self, text="Home", bg="mediumslateblue",
                                     fg="white",
                                     command=lambda: controller.show_frame(Main_menu))
-        Learn_home_btn.pack(padx=5, pady=10)   
+        Learn_home_btn.pack(padx=5, pady=5)   
 
 def click():
     answer = Learn.my_text.get('1.0', tk.END)
-    print(answer)
-    Learn.my_text.delete('1.0', tk.END)
+    answer="1288.0"
+    print(answer.isdecimal())
+    if (answer.isdigit() == False):
+        Learn.promptAnswer_lbl.config(text="wth, please enter a valid number", font = 'LARGEFONT')
+        Learn.my_text.delete('1.0', tk.END)
+    else:
+        #calculate()
+        #print("area in click is: " + str(areaTotal))
+        #print("areaTotal is: " + str(areaTotal))
+        #print("answer is: " + str(answer))
+        if (areaTotal == int(answer)):
+            Learn.promptAnswer_lbl.config(text="Correct!", font = 'LARGEFONT')
+        else:
+            Learn.promptAnswer_lbl.config(text="Wrong!", font = 'LARGEFONT')
+            Learn.my_text.delete('1.0', tk.END)
         
 def plot():
+    global coords
     with open("box_hard_1.txt", "r") as f:
         newWindow = Toplevel(vertech)
         xList = [] # List of all x-values in coordinates
@@ -118,6 +138,8 @@ def plot():
              coords.append(c)
              xList.append(float(temp[0]))
              yList.append(float(temp[1]))
+        #for i in coords:
+        #    print(i)
         fig = Figure(figsize = (5, 5),
                     dpi = 100)
         
@@ -130,12 +152,18 @@ def plot():
         canvas = FigureCanvasTkAgg(fig, master = newWindow)  
         canvas.draw()
         canvas.get_tk_widget().pack()
-            
+
+          
 def calculate():           
-    # Take first two elements in current list
-    areaTotal = 0
+    global coords
+    global areaTotal
+    #print(len(coords))
+    if (len(coords) != 0):
+        coords.pop(-1)
     while coords:
         coords.sort()
+        #print(coords)
+        #print(len(coords))
         c1 = coords[0]
         c2 = coords[1]
         c3 = None
@@ -154,25 +182,25 @@ def calculate():
                 index-=1
                 if (c3 != None and c4 != None):
                     break
-        
+    
         # Find the length between selected coordinates
         length = None
-        if (c3[0] > c4[0]):
+        if (c3!= None and c4 != None and c3[0] > c4[0]):
             length = abs(c4[0]-c1[0])
         else:
             length = abs(c3[0]-c1[0])
         
         # Find width between selected coordinates
         width = abs(c2[1]-c1[1])
-        
         # Find area of figure
         areaCurrent = length * width
         areaTotal += areaCurrent
+        
         #print(length, width, areaCurrent, areaTotal)
         
         # Determine which of the two coordinates extends out further (x-value).
         # Eliminate the coordinate that comes up short.
-        if (c3[0] > c4[0]):
+        if (c3!= None and c4 != None and c3[0] > c4[0]):
             newCoord = (c4[0], c3[1])
             coords.insert(index, newCoord)
             coords.pop(index+1)
@@ -180,7 +208,7 @@ def calculate():
                 temp = coords[0]
                 coords.pop(0)
                 coords.insert(1, temp)
-        elif (c3[0] < c4[0]):
+        elif (c3!= None and c4 != None and c3[0] < c4[0]):
             newCoord = (c3[0], c4[1])
             coords.insert(index, newCoord)
             coords.pop(index+1)
@@ -188,10 +216,10 @@ def calculate():
                 temp = coords[0]
                 coords.pop(0)
                 coords.insert(1, temp)
-        else:
+        elif (c3!= None and c4 != None):
             coords.remove(c3)
-            coords.remove(c4)
-            
+            coords.remove(c4)      
+    print("area in function is: " + str(areaTotal))
 
 def combine_funcs(*funcs):
     def combined_func(*args, **kwargs):
@@ -202,10 +230,8 @@ def combine_funcs(*funcs):
 vertech = vertech()
 #vertech.protocol('WM_DELETE_WINDOW', overrideWindowX)
 vertech.title("Vertech")
-
-vertech.geometry('+%d+%d' % (400, 400))
-#vertech.geometry("400x400")
-
-coords = [] # List of coordinates, saved as tuples
-#vertech.resizable(width=False, height=False)
+vertech.geometry("513x340")
+coords = []  # List of coordinates, saved as tuples
+areaTotal = 0
+vertech.resizable(width=False, height=False)
 vertech.mainloop()
